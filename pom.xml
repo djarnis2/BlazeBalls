@@ -15,6 +15,21 @@
     </properties>
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-controls</artifactId>
+                <version>21.0.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-graphics</artifactId>
+                <version>21.0.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-base</artifactId>
+                <version>21.0.2</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <build>
@@ -31,6 +46,64 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-javafx</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.openjfx</groupId>
+                                    <artifactId>javafx-controls</artifactId>
+                                    <version>21.0.2</version>
+                                    <outputDirectory>${project.basedir}/libs</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.openjfx</groupId>
+                                    <artifactId>javafx-controls</artifactId>
+                                    <classifier>win</classifier>
+                                    <version>21.0.2</version>
+                                    <outputDirectory>${project.basedir}/libs</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.openjfx</groupId>
+                                    <artifactId>javafx-graphics</artifactId>
+                                    <version>21.0.2</version>
+                                    <outputDirectory>${project.basedir}/libs</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.openjfx</groupId>
+                                    <artifactId>javafx-graphics</artifactId>
+                                    <classifier>win</classifier>
+                                    <version>21.0.2</version>
+                                    <outputDirectory>${project.basedir}/libs</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.openjfx</groupId>
+                                    <artifactId>javafx-base</artifactId>
+                                    <version>21.0.2</version>
+                                    <outputDirectory>${project.basedir}/libs</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.openjfx</groupId>
+                                    <artifactId>javafx-base</artifactId>
+                                    <classifier>win</classifier>
+                                    <version>21.0.2</version>
+                                    <outputDirectory>${project.basedir}/libs</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.6.0</version>
@@ -46,9 +119,11 @@
                     <executable>java</executable>
                     <workingDirectory>.</workingDirectory>
                     <longModulepath>false</longModulepath>
+                    <mainClass>dk.sdu.cbse.main.Main</mainClass>
                     <arguments>
                         <argument>--module-path=mods-mvn</argument>
                         <argument>--class-path=libs/*</argument>
+                        <argument>dk.sdu.cbse.main.Main</argument>
                     </arguments>
                 </configuration>
             </plugin>
@@ -122,5 +197,12 @@
         <module>Core</module>
         <module>Player</module>
         <module>Bullet</module>
+        <module>Asteroids</module>
+        <module>Collision</module>
+        <module>Common</module>
+        <module>Enemy</module>
+        <module>CommonAsteroids</module>
+        <module>CommonBullet</module>
+        <module>EnemyBullet</module>
     </modules>
 </project>
