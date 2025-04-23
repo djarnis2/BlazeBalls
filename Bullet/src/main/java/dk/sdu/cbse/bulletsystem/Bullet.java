@@ -1,12 +1,11 @@
-package dk.sdu.cbse.playerbulletsystem;
+package dk.sdu.cbse.bulletsystem;
 
-import dk.sdu.cbse.common.bullet.Bullet;
 import dk.sdu.cbse.common.bullet.BulletSPI;
 import dk.sdu.cbse.common.data.Entity;
 import dk.sdu.cbse.common.data.GameData;
 
-public class PlayerBullet implements BulletSPI {
-    private final String type = "player";
+public class Bullet implements BulletSPI {
+    private final String type = "normal";
 
     @Override
     public String getType() {
@@ -14,7 +13,7 @@ public class PlayerBullet implements BulletSPI {
     }
     @Override
     public Entity createBullet(Entity shooter, GameData gameData) {
-        Entity bullet = new Bullet();
+        Entity bullet = new dk.sdu.cbse.common.bullet.Bullet();
         bullet.setPolygonCoordinates(1, -1, 1, 1, -1, 1, -1, -1);
         double changeX = Math.cos(Math.toRadians(shooter.getRotation()));
         double changeY = Math.sin(Math.toRadians(shooter.getRotation()));

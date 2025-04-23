@@ -7,6 +7,7 @@ import dk.sdu.cbse.common.data.World;
 import dk.sdu.cbse.common.services.IEntityProcessingService;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.ServiceLoader;
 
 import static java.util.stream.Collectors.toList;
@@ -39,24 +40,27 @@ public class EnemySpaceShipControlSystem implements IEntityProcessingService {
                 } else if (rand == 2) {
                     enemy.setRotation(enemy.getRotation() + randDir);
                 } else if (rand == 3) {
-                    // Do nothing
+                    // Do nothing (but some future implementation possible)
                 }
                 dirCooldown = 2.0f;
             }
 
-
+            // enemy shoots on rand == 4
             if (rand == 4) {
                 if (shootCooldown <= 0) {
-                    getBulletSPIs()
+                    // optionally if enemy bullet is present, use this
+                    Optional<BulletSPI> bulletSPI = getBulletSPIs()
                             .stream()
-                            .filter(spi -> spi.getType().equals("enemy"))
-                            .findFirst()
-                            .ifPresent(
-                            spi -> {
-                                world.addEntity(spi.createBullet(enemy, gameData));
-                            }
-                    );
+                            .filter(spi -> "enemy".equals(spi.getType()))
+                            .findFirst();
+                    // if thsi returns null, use any available bullet
+                    if (bulletSPI.isEmpty()) {
+                        bulletSPI = getBulletSPIs()
+                                .stream()
+                                .findFirst();
+                    }
 
+                    bulletSPI.ifPresent(spi -> world.addEntity(spi.createBullet(enemy, gameData)));
                     shootCooldown = 1.0f;
                 }
 
@@ -86,7 +90,7 @@ public class EnemySpaceShipControlSystem implements IEntityProcessingService {
         }
     }
 
-    private Collection<? extends BulletSPI> getBulletSPIs() {
+    private Collection<BulletSPI> getBulletSPIs() {
 
         return ServiceLoader
                 .load(BulletSPI.class)

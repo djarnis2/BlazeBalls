@@ -1,4 +1,4 @@
-package dk.sdu.cbse.playerbulletsystem;
+package dk.sdu.cbse.bulletsystem;
 
 import dk.sdu.cbse.common.bullet.Bullet;
 import dk.sdu.cbse.common.data.Entity;
