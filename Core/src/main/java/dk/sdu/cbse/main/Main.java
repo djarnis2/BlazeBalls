@@ -97,6 +97,8 @@ public class Main extends Application {
     private void render() {
         new AnimationTimer() {
             private long timer = 0;
+            private float accumulator = 0;
+            private final float STEP = 1f/60f; // 60 frames pr second
 
             @Override
             public void handle(long now) {
@@ -107,15 +109,22 @@ public class Main extends Application {
                 float deltaTime = (now - timer) / 1_000_000_000f; // convert to seconds
                 timer = now;
 
-                gameData.setDelta(deltaTime);
+                accumulator += deltaTime;
 
-                update();
-                draw();
-                gameData.getKeys().update();
+                // updates game logic in 60 frames pr second
+                while (accumulator >= STEP) {
+                    gameData.setDelta(STEP);
+                    update();
+                    gameData.getKeys().update();
+                    accumulator -= STEP;
+                    draw();
+                }
+
+
             }
-
         }.start();
     }
+
     private void update() {
         for (IEntityProcessingService entityProcessorService : getEntityProcessingServices()) {
             entityProcessorService.process(gameData, world);

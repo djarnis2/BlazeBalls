@@ -1,4 +1,4 @@
-module dk.sdu.cbse.common.bullet {
+module CommonBullet {
     exports dk.sdu.cbse.common.bullet;
-    requires dk.sdu.cbse.common;
+    requires Common;
 }

@@ -9,6 +9,5 @@ public interface IEntityProcessingService {
      * @param gameData
      * @param world
      */
-
     void process(GameData gameData, World world);
 }

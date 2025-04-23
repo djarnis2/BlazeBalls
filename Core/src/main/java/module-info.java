@@ -1,6 +1,6 @@
-module dk.sdu.cbse.main {
-    requires dk.sdu.cbse.common;
-    requires dk.sdu.cbse.common.bullet;
+module Core {
+    requires Common;
+    requires CommonBullet;
     requires javafx.graphics;
 
     opens dk.sdu.cbse.main to javafx.graphics;
