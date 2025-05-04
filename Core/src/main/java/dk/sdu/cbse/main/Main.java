@@ -9,6 +9,7 @@ import dk.sdu.cbse.common.services.IGamePluginService;
 import dk.sdu.cbse.common.services.IPostEntityProcessingService;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
@@ -92,6 +93,12 @@ public class Main extends Application {
         window.setScene(scene);
         window.setTitle("BlazeBalls");
         window.show();
+        window.setOnCloseRequest(e -> {
+            for (IGamePluginService plugin : getPluginServices()) {
+                plugin.stop(gameData, world);
+            }
+            Platform.exit();
+        });
     }
     // render() bliver kaldt meget ofte - skal ikke være for tung
     private void render() {

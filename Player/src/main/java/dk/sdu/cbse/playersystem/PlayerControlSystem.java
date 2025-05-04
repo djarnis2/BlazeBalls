@@ -16,12 +16,19 @@ import static java.util.stream.Collectors.toList;
 public class PlayerControlSystem implements IEntityProcessingService {
     private static final float ROTATION_SPEED = 180f; // angle degrees per second
     private static final float MOVEMENT_SPEED = 200f; // units per second
+    private static final float BULLET_COOLDOWN = 0.5f;
 
     @Override
     public void process(GameData gameData, World world) {
         float delta = gameData.getDelta();
 
         for (Entity player : world.getEntities(Player.class)) {
+            if (player.getData("bulletCooldown") == null) {
+                player.setData("bulletCooldown", 0f);
+            }
+
+            float bulletCooldown = (float) player.getData("bulletCooldown");
+            bulletCooldown -= delta;
 
             if (gameData.getKeys().isDown(GameKeys.LEFT)) {
                 player.setRotation(player.getRotation() - ROTATION_SPEED * delta);
@@ -36,13 +43,17 @@ public class PlayerControlSystem implements IEntityProcessingService {
                 player.setX(player.getX() + changeX);
                 player.setY(player.getY() + changeY);
             }
-            if (gameData.getKeys().isDown(GameKeys.SPACE)) {
+            if (gameData.getKeys().isDown(GameKeys.SPACE) && bulletCooldown <= 0f) {
                 getBulletSPIs()
                         .stream()
                         .filter(spi -> spi.getType().equals("normal"))
                         .findFirst()
                         .ifPresent(spi -> world.addEntity(spi.createBullet(player, gameData)));
+
+                bulletCooldown = BULLET_COOLDOWN;
             }
+
+            player.setData("bulletCooldown", bulletCooldown);
 
             // Don't let player go out of bounds
             if (player.getX() < 0) {

@@ -16,6 +16,7 @@ public class BulletControlSystem implements IEntityProcessingService {
     public void process(GameData gameData, World world) {
         List<Entity> deleteBullets = new ArrayList<>();
 
+
         for (Entity bullet : world.getEntities(Bullet.class)) {
             float delta = gameData.getDelta();
             float speed = DEFAULT_BULLET_SPEED;
