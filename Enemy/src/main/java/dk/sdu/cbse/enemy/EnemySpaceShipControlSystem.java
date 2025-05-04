@@ -14,7 +14,8 @@ import static java.util.stream.Collectors.toList;
 
 
 public class EnemySpaceShipControlSystem implements IEntityProcessingService {
-
+    private static final float ROTATION_MAX = 20f; // angle degrees per second
+    private static final float MOVEMENT_SPEED = 200f; // units per second
 
     @Override
     public void process(GameData gameData, World world) {
@@ -33,7 +34,7 @@ public class EnemySpaceShipControlSystem implements IEntityProcessingService {
             dirCooldown -= delta;
             // for choosing between rotations left or right, move or shoot
             int rand = (int) (Math.random() * 4 + 1);
-            int randDir = (int) (Math.random() * 100 + 1);
+            float randDir = (float) (Math.random() * ROTATION_MAX + 1);
             if (dirCooldown <= 0) {
                 if (rand == 1) {
                     enemy.setRotation(enemy.getRotation() - randDir);
@@ -42,7 +43,7 @@ public class EnemySpaceShipControlSystem implements IEntityProcessingService {
                 } else if (rand == 3) {
                     // Do nothing (but some future implementation possible)
                 }
-                dirCooldown = 2.0f;
+                dirCooldown = 0.15f;
             }
 
             // enemy shoots on rand == 4
@@ -53,10 +54,11 @@ public class EnemySpaceShipControlSystem implements IEntityProcessingService {
                             .stream()
                             .filter(spi -> "enemy".equals(spi.getType()))
                             .findFirst();
-                    // if thsi returns null, use any available bullet
+                    // if no bullet of type enemy is found, fallback to DEFAULT_TYPE
                     if (bulletSPI.isEmpty()) {
                         bulletSPI = getBulletSPIs()
                                 .stream()
+                                .filter(spi -> BulletSPI.DEFAULT_TYPE.equals(spi.getType()))
                                 .findFirst();
                     }
 
@@ -65,26 +67,27 @@ public class EnemySpaceShipControlSystem implements IEntityProcessingService {
                 }
 
             }
-            double changeX = Math.cos(Math.toRadians(enemy.getRotation()));
-            double changeY = Math.sin(Math.toRadians(enemy.getRotation()));
+            float radians = (float) Math.toRadians(enemy.getRotation());
+            float changeX = (float) Math.cos(radians) * MOVEMENT_SPEED * delta;
+            float changeY = (float) Math.sin(radians) * MOVEMENT_SPEED * delta;
             enemy.setX(enemy.getX() + changeX);
             enemy.setY(enemy.getY() + changeY);
             enemy.setData("shootCooldown", shootCooldown);
             enemy.setData("dirCooldown", dirCooldown);
 
-            if (enemy.getX() < 1) {
+            if (enemy.getX() < 0) {
                 enemy.setRotation((enemy.getRotation() + 180) % 360);
             }
 
-            if (enemy.getX() > (gameData.getDisplayWidth() - 1)) {
+            if (enemy.getX() > (gameData.getDisplayWidth())) {
                 enemy.setRotation((enemy.getRotation() + 180) % 360);
             }
 
-            if (enemy.getY() < 1) {
+            if (enemy.getY() < 0) {
                 enemy.setRotation((enemy.getRotation() + 180) % 360);
             }
 
-            if (enemy.getY() > (gameData.getDisplayHeight() - 1)) {
+            if (enemy.getY() > (gameData.getDisplayHeight())) {
                 enemy.setRotation((enemy.getRotation() + 180) % 360);
             }
         }

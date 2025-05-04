@@ -14,53 +14,52 @@ import static java.util.stream.Collectors.toList;
 
 
 public class PlayerControlSystem implements IEntityProcessingService {
-
+    private static final float ROTATION_SPEED = 180f; // angle degrees per second
+    private static final float MOVEMENT_SPEED = 200f; // units per second
 
     @Override
     public void process(GameData gameData, World world) {
-
+        float delta = gameData.getDelta();
 
         for (Entity player : world.getEntities(Player.class)) {
 
             if (gameData.getKeys().isDown(GameKeys.LEFT)) {
-                player.setRotation(player.getRotation() - 5);
+                player.setRotation(player.getRotation() - ROTATION_SPEED * delta);
             }
             if (gameData.getKeys().isDown(GameKeys.RIGHT)) {
-                player.setRotation(player.getRotation() + 5);
+                player.setRotation(player.getRotation() + ROTATION_SPEED * delta);
             }
             if (gameData.getKeys().isDown(GameKeys.UP)) {
-                double changeX = Math.cos(Math.toRadians(player.getRotation()));
-                double changeY = Math.sin(Math.toRadians(player.getRotation()));
+                float radians = (float) Math.toRadians(player.getRotation());
+                float changeX = (float)Math.cos(radians) * MOVEMENT_SPEED * delta;
+                float changeY = (float)Math.sin(radians) * MOVEMENT_SPEED * delta;
                 player.setX(player.getX() + changeX);
                 player.setY(player.getY() + changeY);
             }
-            if(gameData.getKeys().isDown(GameKeys.SPACE)) {
+            if (gameData.getKeys().isDown(GameKeys.SPACE)) {
                 getBulletSPIs()
                         .stream()
                         .filter(spi -> spi.getType().equals("normal"))
                         .findFirst()
-                        .ifPresent(
-                                spi -> {world.addEntity(spi.createBullet(player, gameData));}
-                        );
+                        .ifPresent(spi -> world.addEntity(spi.createBullet(player, gameData)));
             }
 
+            // Don't let player go out of bounds
             if (player.getX() < 0) {
-                player.setX(1);
+                player.setX(0);
             }
 
             if (player.getX() > gameData.getDisplayWidth()) {
-                player.setX(gameData.getDisplayWidth()-1);
+                player.setX(gameData.getDisplayWidth());
             }
 
             if (player.getY() < 0) {
-                player.setY(1);
+                player.setY(0);
             }
 
             if (player.getY() > gameData.getDisplayHeight()) {
-                player.setY(gameData.getDisplayHeight()-1);
+                player.setY(gameData.getDisplayHeight());
             }
-
-
         }
     }
 

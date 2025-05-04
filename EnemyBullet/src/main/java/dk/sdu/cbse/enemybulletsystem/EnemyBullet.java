@@ -15,7 +15,9 @@ public class EnemyBullet implements BulletSPI {
     @Override
     public Entity createBullet(Entity shooter, GameData gameData) {
         Entity bullet = new Bullet();
-//        bullet.setPolygonCoordinates(3, -3, 3, 3, -3, 3, -3, -3);
+        bullet.setData("speed", 1000f);
+        bullet.setData("type", "enemy");
+        bullet.setRadius(5);
         bullet.setPolygonCoordinates(
                 0, -12,  // Top spids
                 3, -3,   // Mellem top og højre spids
@@ -28,12 +30,13 @@ public class EnemyBullet implements BulletSPI {
                 -12, -3, // Venstre spids
                 -3, -3   // Mellem venstre og top spids
         );
+        bullet.setRotation(shooter.getRotation());
         double changeX = Math.cos(Math.toRadians(shooter.getRotation()));
         double changeY = Math.sin(Math.toRadians(shooter.getRotation()));
-        bullet.setX(shooter.getX() + changeX * 20);
-        bullet.setY(shooter.getY() + changeY * 20);
-        bullet.setRotation(shooter.getRotation());
-        bullet.setRadius(1);
+        double offset = 20;
+        bullet.setX(shooter.getX() + changeX * offset);
+        bullet.setY(shooter.getY() + changeY * offset);
+
         return bullet;
     }
 }

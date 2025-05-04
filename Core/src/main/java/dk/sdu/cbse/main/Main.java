@@ -119,8 +119,6 @@ public class Main extends Application {
                     accumulator -= STEP;
                     draw();
                 }
-
-
             }
         }.start();
     }

@@ -3,3 +3,4 @@
 target/
 mods-mvn/
 libs/
+**/target/
