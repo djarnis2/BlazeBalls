@@ -28,6 +28,7 @@ public class AsteroidFactory {
         // setting random speed on each entity
         float speed = 100f + (float) Math.random() * 50;
         asteroid.setData("speed", speed);
+        asteroid.setData("type", "asteroid");
         return asteroid;
     }
 
@@ -47,6 +48,6 @@ public class AsteroidFactory {
                 fragments.add(newAsteroid);
             }
         }
-        return fragments;
+        return fragments; // only if canSplit() That is if size is larger than 1
     }
 }

@@ -12,13 +12,19 @@ public class CollisionDetector implements IPostEntityProcessingService {
     @Override
     public void process(GameData gameData, World world) {
         List<Entity> entities = new ArrayList<>(world.getEntities());
+        for (Entity entity : entities) {
+            entity.setData("collidesWith", null);
+            entity.setData("collidesWithType", null);
+        }
         for (int i = 0; i < entities.size(); i++) {
             for (int j = i + 1; j < entities.size(); j++) {
                 Entity entity1 = entities.get(i);
                 Entity entity2 = entities.get(j);
                 if (this.collides(entity1,entity2)) {
                     entity1.setData("collidesWith", entity2);
+                    entity1.setData("collidesWithType", entity2.getData("type"));
                     entity2.setData("collidesWith", entity1);
+                    entity2.setData("collidesWithType", entity1.getData("type"));
                 }
             }
         }

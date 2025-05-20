@@ -21,6 +21,7 @@ public class Bullet implements BulletSPI {
         bullet.setY(shooter.getY() + changeY * 20);
         bullet.setRotation(shooter.getRotation());
         bullet.setRadius(1);
+        bullet.setData("type", "bullet");
         return bullet;
     }
 }

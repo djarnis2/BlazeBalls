@@ -18,6 +18,8 @@ public class EnemyFactory {
         enemySpaceShip.setY(randomY);
         enemySpaceShip.setData("shootCooldown", 0f);
         enemySpaceShip.setData("dirCooldown", 0f);
+        enemySpaceShip.setData("type", "enemy");
+        enemySpaceShip.setData("health", 2);
         return enemySpaceShip;
     }
 }

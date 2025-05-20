@@ -15,10 +15,10 @@ public class AsteroidPostProcessingSystem implements IPostEntityProcessingServic
             if (collider != null && !(collider instanceof Asteroid)) {
                 List<Asteroid> fragments = AsteroidFactory.splitAsteroid((Asteroid)entity,gameData);
                 fragments.forEach(world::addEntity);
-                world.removeEntity(entity);
+                world.removeEntity(entity); // The original asteroid
+                world.removeEntity(collider); // player or enemy only
             }
             entity.setData("collidesWith", null); // clean up
         }
-
     }
 }
