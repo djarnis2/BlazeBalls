@@ -201,8 +201,8 @@
         <module>Collision</module>
         <module>Common</module>
         <module>Enemy</module>
-        <module>CommonAsteroids</module>
         <module>CommonBullet</module>
         <module>EnemyBullet</module>
+        <module>SuperEnemy</module>
     </modules>
 </project>
