@@ -2,9 +2,7 @@ module Core {
     requires Common;
     requires CommonBullet;
     requires javafx.graphics;
-    requires Enemy;
-    requires SuperEnemy;
-
+    requires java.xml;
 
     opens dk.sdu.cbse.main to javafx.graphics;
 

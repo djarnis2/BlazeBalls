@@ -11,8 +11,6 @@ public class EnemyFactory {
 
         Entity enemySpaceShip = new EnemySpaceShip();
         enemySpaceShip.setPolygonCoordinates(-15,-15,30,0,-15,15);
-        enemySpaceShip.setX((double) gameData.getDisplayHeight() /2);
-        enemySpaceShip.setY((double) gameData.getDisplayWidth() /2);
         enemySpaceShip.setRadius(20);
         enemySpaceShip.setX(randomX);
         enemySpaceShip.setY(randomY);

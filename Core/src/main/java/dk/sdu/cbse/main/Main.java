@@ -18,10 +18,13 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.ServiceLoader;
+import java.lang.module.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 
@@ -31,6 +34,10 @@ public class Main extends Application {
     private final World world = new World();
     private final Map<Entity, Polygon> polygons = new ConcurrentHashMap<>();
     private final Pane gameWindow = new Pane();
+
+    private ModuleLayer coreLayer;
+    private ModuleLayer enemyLayer;
+    private ModuleLayer superLayer;
 
     public static void main(String[] args) {
         launch(Main.class);
@@ -76,10 +83,9 @@ public class Main extends Application {
 
         });
 
-        // Lookup all Game Plugins using ServiceLoader
-        for (IGamePluginService iGamePlugin : getPluginServices()) {
-            iGamePlugin.start(gameData, world);
-        }
+
+        initModuleLayers();
+        startPlugins();
 
         // Lookup all Entities using ServiceLoader and add to map and gameWindow.
         for (Entity entity : world.getEntities()) {
@@ -94,9 +100,7 @@ public class Main extends Application {
         window.setTitle("BlazeBalls");
         window.show();
         window.setOnCloseRequest(e -> {
-            for (IGamePluginService plugin : getPluginServices()) {
-                plugin.stop(gameData, world);
-            }
+            stopAllPlugins();
             Platform.exit();
         });
     }
@@ -124,19 +128,18 @@ public class Main extends Application {
                     update();
                     gameData.getKeys().update();
                     accumulator -= STEP;
-                    draw();
                 }
+                draw();
             }
         }.start();
     }
 
     private void update() {
-        for (IEntityProcessingService entityProcessorService : getEntityProcessingServices()) {
-            entityProcessorService.process(gameData, world);
-        }
-        for (IPostEntityProcessingService postEntityProcessorService : getPostEntityProcessingServices()) {
-            postEntityProcessorService.process(gameData, world);
-        }
+        loadAllServices(IEntityProcessingService.class)
+                .forEach(s -> s.process(gameData, world));
+        gameData.getKeys().update();
+        loadAllServices(IPostEntityProcessingService.class)
+                .forEach(s -> s.process(gameData, world));
     }
 
     private void draw() {
@@ -161,16 +164,87 @@ public class Main extends Application {
         }
 
     }
-    private Collection<? extends IGamePluginService> getPluginServices() {
 
-        return ServiceLoader.load(IGamePluginService.class).stream().map(ServiceLoader.Provider::get).collect(toList());
+    private void initModuleLayers() {
+        ModuleLayer boot = ModuleLayer.boot();
+        Path mods = Paths.get("mods-mvn");
+
+        // Core Layer (includes all but Enemy and SuperEnemy Modules
+        ModuleFinder coreFinder = ModuleFinder.of(mods);
+        Set<String> coreMods = coreFinder.findAll().stream()
+                .map(ModuleReference::descriptor)
+                .map(ModuleDescriptor::name)
+                .filter(n -> !n.equals("Enemy") && !n.equals("SuperEnemy") && !n.endsWith("Empty"))
+                .collect(Collectors.toSet());
+        Configuration coreCnf = boot.configuration()
+                // before - after - roots
+                .resolve(coreFinder, ModuleFinder.of(), coreMods);
+
+        System.out.println("==== Core layer ====");
+        coreCnf.modules().stream()
+                .map(ResolvedModule::name)
+                .sorted()
+                .forEach(name -> System.out.println(" " + name));
+
+        coreLayer = boot.defineModulesWithOneLoader(coreCnf, ClassLoader.getSystemClassLoader());
+//        coreLayer.modules().forEach(m -> System.out.println("coreLayer.modules: "+m));
+
+        // Enemy layer build on support layer
+        ModuleFinder enemyFinder = ModuleFinder.of(mods);
+        Configuration enemyCnf = boot.configuration()
+                .resolve(enemyFinder, ModuleFinder.of(), Set.of("Enemy"));
+        System.out.println("==== Enemy layer ====");
+        enemyCnf.modules().stream()
+                .map(ResolvedModule::name)
+                .sorted()
+                .forEach(name -> System.out.println(" " + name));
+        enemyLayer = boot.defineModulesWithOneLoader(enemyCnf, ClassLoader.getSystemClassLoader());
+
+        // SuperEnemy layer build on boot
+        Path plugins = Paths.get("plugins");
+        ModuleFinder superFinder = ModuleFinder.of(plugins);
+        Configuration superCnf = boot.configuration()
+                .resolve(superFinder, ModuleFinder.of(), Set.of("SuperEnemy"));
+        System.out.println("==== Super layer ====");
+        superCnf.modules().stream()
+                .map(ResolvedModule::name)
+                .sorted()
+                .forEach(name -> System.out.println(" " + name));
+        superLayer = boot.defineModulesWithOneLoader(superCnf, ClassLoader.getSystemClassLoader());
     }
 
-    private Collection<? extends IEntityProcessingService> getEntityProcessingServices() {
-        return ServiceLoader.load(IEntityProcessingService.class).stream().map(ServiceLoader.Provider::get).collect(toList());
+    private <T> Collection <T> loadAllServices(Class<T> serviceType) {
+        Stream<ServiceLoader.Provider<T>> providers =
+                Stream.of(coreLayer, enemyLayer, superLayer)
+                        .flatMap(layer ->
+                                ServiceLoader.load(layer,serviceType).stream());
+        //  All layers are build on the coreLayer, some modules are pulled in several times
+        // This method returns only unique modules (by name)
+        return providers
+                .map(ServiceLoader.Provider::get)
+                .collect(Collectors.toMap(
+                        // mapping name of the class
+                        p -> p.getClass().getName(),
+                        // and taking only the first instance.
+                        p -> p,
+                        (a,b) -> a
+                )).values();
     }
 
-    private Collection<? extends IPostEntityProcessingService> getPostEntityProcessingServices() {
-        return ServiceLoader.load(IPostEntityProcessingService.class).stream().map(ServiceLoader.Provider::get).collect(toList());
+    // start plugins using the unique plugins from loadAllServices
+    private void startPlugins() {
+        loadAllServices(IGamePluginService.class)
+                .forEach(s -> s.start(gameData, world));
     }
+
+    // stop all plugins
+    private void stopAllPlugins() {
+        Stream.of(coreLayer, enemyLayer, superLayer)
+                .flatMap(layer ->
+                        ServiceLoader.load(layer, IGamePluginService.class)
+                                .stream()
+                                .map(ServiceLoader.Provider::get))
+                .forEach(p -> p.stop(gameData, world));
+    }
+
 }
