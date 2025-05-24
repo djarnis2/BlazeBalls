@@ -1,0 +1,5 @@
+digraph "CommonBullet" {
+    // Path: C:\Users\larsk\OneDrive - Syddansk Universitet\SDU\Semester4\CBSE\Projekt\BlazeBalls\mods-mvn\CommonBullet-1.0-SNAPSHOT.jar
+   "dk.sdu.cbse.common.bullet"                        -> "dk.sdu.cbse.common.data (Common)";
+   "dk.sdu.cbse.common.bullet"                        -> "java.lang (java.base)";
+}

@@ -1,0 +1,12 @@
+digraph "Enemy" {
+    // Path: C:\Users\larsk\OneDrive - Syddansk Universitet\SDU\Semester4\CBSE\Projekt\BlazeBalls\mods-mvn\Enemy-1.0-SNAPSHOT.jar
+   "dk.sdu.cbse.enemy"                                -> "dk.sdu.cbse.common.bullet (CommonBullet)";
+   "dk.sdu.cbse.enemy"                                -> "dk.sdu.cbse.common.data (Common)";
+   "dk.sdu.cbse.enemy"                                -> "dk.sdu.cbse.common.services (Common)";
+   "dk.sdu.cbse.enemy"                                -> "dk.sdu.cbse.enemy (Enemy)";
+   "dk.sdu.cbse.enemy"                                -> "java.lang (java.base)";
+   "dk.sdu.cbse.enemy"                                -> "java.lang.invoke (java.base)";
+   "dk.sdu.cbse.enemy"                                -> "java.util (java.base)";
+   "dk.sdu.cbse.enemy"                                -> "java.util.function (java.base)";
+   "dk.sdu.cbse.enemy"                                -> "java.util.stream (java.base)";
+}

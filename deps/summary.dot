@@ -1,0 +1,8 @@
+digraph "summary" {
+  "Common"                                           -> "java.base (java.base)";
+  "CommonBullet"                                     -> "Common";
+  "CommonBullet"                                     -> "java.base (java.base)";
+  "Enemy"                                            -> "Common";
+  "Enemy"                                            -> "CommonBullet";
+  "Enemy"                                            -> "java.base (java.base)";
+}
