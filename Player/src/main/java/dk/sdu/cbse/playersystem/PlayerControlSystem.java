@@ -1,7 +1,7 @@
 package dk.sdu.cbse.playersystem;
 
 import dk.sdu.cbse.common.services.IEntityProcessingService;
-import dk.sdu.cbse.common.bullet.BulletSPI;
+import dk.sdu.cbse.common.services.BulletSPI;
 import dk.sdu.cbse.common.data.Entity;
 import dk.sdu.cbse.common.data.GameData;
 import dk.sdu.cbse.common.data.GameKeys;

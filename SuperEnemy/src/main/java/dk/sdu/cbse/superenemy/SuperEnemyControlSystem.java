@@ -1,5 +1,5 @@
 package dk.sdu.cbse.superenemy;
-import dk.sdu.cbse.common.bullet.BulletSPI;
+import dk.sdu.cbse.common.services.BulletSPI;
 import dk.sdu.cbse.common.data.Entity;
 import dk.sdu.cbse.common.data.GameData;
 import dk.sdu.cbse.common.data.World;

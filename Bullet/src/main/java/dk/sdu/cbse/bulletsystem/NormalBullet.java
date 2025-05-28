@@ -1,10 +1,10 @@
 package dk.sdu.cbse.bulletsystem;
 
-import dk.sdu.cbse.common.bullet.BulletSPI;
+import dk.sdu.cbse.common.services.BulletSPI;
 import dk.sdu.cbse.common.data.Entity;
 import dk.sdu.cbse.common.data.GameData;
 
-public class Bullet implements BulletSPI {
+public class NormalBullet implements BulletSPI {
     private final String type = "normal";
 
     @Override

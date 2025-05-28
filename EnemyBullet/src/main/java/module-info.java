@@ -1,6 +1,8 @@
+import dk.sdu.cbse.common.services.BulletSPI;
+
 module EnemyBullet {
     exports dk.sdu.cbse.enemybulletsystem;
     requires Common;
     requires CommonBullet;
-    provides dk.sdu.cbse.common.bullet.BulletSPI with dk.sdu.cbse.enemybulletsystem.EnemyBullet;
+    provides BulletSPI with dk.sdu.cbse.enemybulletsystem.EnemyBullet;
 }
