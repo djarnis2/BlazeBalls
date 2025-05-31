@@ -5,7 +5,7 @@ import dk.sdu.cbse.common.data.World;
 import dk.sdu.cbse.common.services.IEntityProcessingService;
 
 public class SuperEnemySpawnSystem implements IEntityProcessingService {
-    private static final float SPAWN_INTERVAL = 30.0f;
+    private static final float SPAWN_INTERVAL = 15.0f;
 
     @Override
     public void process(GameData gameData, World world) {

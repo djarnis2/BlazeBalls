@@ -7,12 +7,15 @@ import dk.sdu.cbse.common.data.World;
 import dk.sdu.cbse.common.services.IEntityProcessingService;
 import dk.sdu.cbse.common.services.IGamePluginService;
 import dk.sdu.cbse.common.services.IPostEntityProcessingService;
+import dk.sdu.cbse.common.services.IScoreService;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.*;
 import javafx.scene.shape.Polygon;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
@@ -29,27 +32,46 @@ public class Game {
     private final World world = new World();
     private final Map<Entity, Polygon> polygons = new ConcurrentHashMap<>();
     private final Pane gameWindow = new Pane();
+    private int points = 0;
+    private final Text scoreText = new Text();
 
     private final List<IGamePluginService> gamePluginServices;
     private final List<IEntityProcessingService> entityProcessingServices;
     private final List<IPostEntityProcessingService> postEntityProcessingServices;
+    private final List<IScoreService> scoreServices;
 
 
     public Game(List<IGamePluginService> gamePluginServices,
                 List<IEntityProcessingService> entityProcessingServices,
-                List<IPostEntityProcessingService> postEntityProcessingServices) {
+                List<IPostEntityProcessingService> postEntityProcessingServices,
+                List<IScoreService> scoreServices) {
         this.gamePluginServices = gamePluginServices;
         this.entityProcessingServices = entityProcessingServices;
         this.postEntityProcessingServices = postEntityProcessingServices;
+        this.scoreServices = scoreServices;
     }
 
     public void start(Stage window) throws Exception {
-        Text destroyed = new Text((gameData.getDisplayWidth() /2) -80, 20, "Destroyed asteroids: 0");
-        Text score = new Text((gameData.getDisplayWidth() -60) , 20, "Score: 0");
+        scoreText.setX(gameData.getDisplayWidth() - 240);
+        scoreText.setY(80);
+        scoreText.setText("Score: " + points);
+        scoreText.setFont(Font.font(40));
 
         gameWindow.setPrefSize(gameData.getDisplayWidth(), gameData.getDisplayHeight());
-        gameWindow.getChildren().add(destroyed);
-        gameWindow.getChildren().add(score);
+        gameWindow.getChildren().add(scoreText);
+
+        BackgroundImage backgroundImage = new BackgroundImage(
+                new Image(getClass().getResource("/background.png").toExternalForm() ,
+                        gameData.getDisplayWidth(),
+                        gameData.getDisplayHeight(),
+                        false,
+                        true),
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundPosition.DEFAULT,
+                BackgroundSize.DEFAULT
+        );
+        gameWindow.setBackground(new Background(backgroundImage));
 
         Scene scene = new Scene(gameWindow);
         scene.setOnKeyPressed(event -> {
@@ -106,12 +128,13 @@ public class Game {
             Platform.exit();
         });
     }
+
     // render() bliver kaldt meget ofte - skal ikke være for tung
     public void render() {
         new AnimationTimer() {
             private long timer = 0;
             private float accumulator = 0;
-            private final float STEP = 1f/60f; // 60 frames pr second
+            private final float STEP = 1f / 60f; // 60 frames pr second
 
             @Override
             public void handle(long now) {
@@ -143,11 +166,15 @@ public class Game {
         for (IPostEntityProcessingService postEntityProcessorService : getPostEntityProcessingServices()) {
             postEntityProcessorService.process(gameData, world);
         }
+        for (IScoreService scoreService : getIScoreServices()) {
+            points = scoreService.getScore();
+        }
     }
 
     private void draw() {
+        scoreText.setText("Score: " + points);
         for (Entity polygonEntity : polygons.keySet()) {
-            if(!world.getEntities().contains(polygonEntity)){
+            if (!world.getEntities().contains(polygonEntity)) {
                 Polygon removedPolygon = polygons.get(polygonEntity);
                 polygons.remove(polygonEntity);
                 gameWindow.getChildren().remove(removedPolygon);
@@ -166,13 +193,20 @@ public class Game {
             polygon.setRotate(entity.getRotation());
         }
     }
+
     public List<IGamePluginService> getGamePluginServices() {
         return gamePluginServices;
     }
+
     public List<IEntityProcessingService> getEntityProcessingServices() {
         return entityProcessingServices;
     }
+
     public List<IPostEntityProcessingService> getPostEntityProcessingServices() {
         return postEntityProcessingServices;
+    }
+
+    public List<IScoreService> getIScoreServices() {
+        return scoreServices;
     }
 }

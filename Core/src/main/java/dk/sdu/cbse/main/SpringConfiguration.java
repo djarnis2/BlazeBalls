@@ -7,7 +7,9 @@ import dk.sdu.cbse.common.services.IPostEntityProcessingService;
 import java.util.List;
 import static java.util.stream.Collectors.toList;
 import java.util.ServiceLoader;
+import java.util.stream.Collectors;
 
+import dk.sdu.cbse.common.services.IScoreService;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Bean;
 
@@ -19,9 +21,10 @@ public class SpringConfiguration {
     public SpringConfiguration() {
     }
 
+
     @Bean
     public Game game() {
-        return new Game(getPluginServices(),getEntityProcessingServices(),getPostEntityProcessingServices());
+        return new Game(getPluginServices(),getEntityProcessingServices(),getPostEntityProcessingServices(), getScoreServices());
     }
 
 
@@ -38,5 +41,9 @@ public class SpringConfiguration {
 
     public List<IPostEntityProcessingService> getPostEntityProcessingServices() {
         return ServiceLoader.load(IPostEntityProcessingService.class).stream().map(ServiceLoader.Provider::get).collect(toList());
+    }
+
+    public List<IScoreService> getScoreServices() {
+        return ServiceLoader.load(IScoreService.class).stream().map(ServiceLoader.Provider::get).collect(Collectors.toList());
     }
 }
