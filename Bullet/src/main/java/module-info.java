@@ -4,4 +4,5 @@ module Bullet {
     provides dk.sdu.cbse.common.services.IGamePluginService with dk.sdu.cbse.bulletsystem.BulletPlugin;
     provides dk.sdu.cbse.common.services.BulletSPI with dk.sdu.cbse.bulletsystem.NormalBullet;
     provides dk.sdu.cbse.common.services.IEntityProcessingService with dk.sdu.cbse.bulletsystem.BulletControlSystem;
+    provides dk.sdu.cbse.common.services.IPostEntityProcessingService with dk.sdu.cbse.bulletsystem.BulletPostProcessingSystem;
 }
