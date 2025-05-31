@@ -1,5 +1,4 @@
 module Bullet {
-    exports dk.sdu.cbse.bulletsystem;
     requires Common;
     requires CommonBullet;
     provides dk.sdu.cbse.common.services.IGamePluginService with dk.sdu.cbse.bulletsystem.BulletPlugin;
